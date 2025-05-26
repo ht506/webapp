@@ -42,6 +42,7 @@ function App() {
       try {
         const response = await fetch('https://webapp-backend-9ugp.onrender.com/notes');
         const data = await response.json();
+        console.log("Loaded notes:", data);
         setNotes(data);
       } catch (error) {
         console.error("Failed to load notes:", error);
@@ -52,15 +53,22 @@ function App() {
     loadNotes();
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
     const interval = setInterval(() => {
       fetch('https://webapp-backend-9ugp.onrender.com/notes')
         .then(res => res.json())
-        .then(data => setNotes(data))
+        .then(serverNotes => {
+          setNotes(prevNotes => {
+            // Merge server data with local UI state (like 'isNew')
+            return serverNotes.map(serverNote => {
+              const localNote = prevNotes.find(n => n.id === serverNote.id);
+              return localNote ? { ...serverNote, isNew: localNote.isNew } : serverNote;
+            });
+          });
+        })
         .catch(console.error);
-    }, 3000); // Checks for updates every 3 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const clearNotes = () => {
