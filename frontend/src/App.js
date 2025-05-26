@@ -73,14 +73,16 @@ function App() {
 
   const handleSubmit = async () => {
     if (noteText.trim() === "") return;
-
+  
     try {
       const response = await fetch('https://webapp-backend-9ugp.onrender.com/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: noteText.trim(),
-          color: selectedColor
+          color: selectedColor,
+          userId: userId,       // Add this line
+          username: username    // Add this line
         })
       });
       const newNote = await response.json();
@@ -296,37 +298,26 @@ function App() {
         }
         
         .reply-card.you {
-          background: #333;
+          background: #264B9A; /* Blue color for your replies */
           align-self: flex-start;
           margin-left: 12px;
         }
         
         .reply-card.others {
-          background: #444;
+          background: #2E7D32; /* Green color for others' replies */
           align-self: flex-end;
           margin-right: 12px;
         }
         
-        /* Arrow for your replies (points left) */
+        /* Make arrows more visible */
         .reply-card.you::after {
-          content: '';
-          position: absolute;
-          left: -10px;
-          bottom: 10px;
-          border-width: 8px 10px 8px 0;
-          border-style: solid;
-          border-color: transparent #333 transparent transparent;
+          border-width: 10px 12px 10px 0;
+          left: -12px;
         }
         
-        /* Arrow for others' replies (points right) */
         .reply-card.others::after {
-          content: '';
-          position: absolute;
-          right: -10px;
-          bottom: 10px;
-          border-width: 8px 0 8px 10px;
-          border-style: solid;
-          border-color: transparent transparent transparent #444;
+          border-width: 10px 0 10px 12px;
+          right: -12px;
         }
         
         .reply-username {
@@ -447,53 +438,75 @@ function App() {
                   transformOrigin: "center bottom",
                   backfaceVisibility: "hidden",
                   WebkitBackfaceVisibility: "hidden",
-                  animationDelay: `${index * 0.1}s` // Stagger loading animation
+                  animationDelay: `${index * 0.1}s`
                 }}
                 onClick={(e) => {
-                  // Only open if click wasn't on the button or a link
                   if (!e.target.closest('button, a')) {
                     openNoteThread(index);
                   }
                 }}
               >
-                <div style={{ flex: "1 1 auto" }}>{note.text}</div>
-                <div
-                  style={{
-                    fontSize: "0.7rem",
-                    marginTop: "0.5rem",
-                    opacity: 0.6,
-                    userSelect: "none",
-                  }}
-                >
-                  {new Date(note.createdAt).toLocaleString("en-US", {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                {/* Username and Text Content */}
+                <div>
+                  <div style={{ 
+                    fontWeight: 'bold', 
+                    fontSize: '0.8rem',
+                    marginBottom: '4px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {note.username || 'Anonymous'}
+                  </div>
+                  <div style={{ 
+                    flex: "1 1 auto",
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {note.text}
+                  </div>
                 </div>
-                <button
-                  onClick={() => openNoteThread(index)}
-                  style={{
-                    marginTop: "6px",
-                    alignSelf: "flex-start",
-                    background: colorConfig.bg,
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "0.3rem 0.8rem",
-                    fontSize: "0.8rem",
-                    color: colorConfig.text,
-                    fontWeight: "bold",
-                    userSelect: "none",
-                  }}
-                >
-                  Open It
-                </button>
+              
+                {/* Date and Button */}
+                <div>
+                  <div
+                    style={{
+                      fontSize: "0.7rem",
+                      marginTop: "0.5rem",
+                      opacity: 0.6,
+                      userSelect: "none",
+                    }}
+                  >
+                    {new Date(note.createdAt).toLocaleString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <button
+                    onClick={() => openNoteThread(index)}
+                    style={{
+                      marginTop: "6px",
+                      alignSelf: "flex-start",
+                      background: colorConfig.bg,
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.3rem 0.8rem",
+                      fontSize: "0.8rem",
+                      color: colorConfig.text,
+                      fontWeight: "bold",
+                      userSelect: "none",
+                    }}
+                  >
+                    Open It
+                  </button>
+                </div>
               </div>
-            );
-          })}
-        </div>
 
         {/* Modal for adding new note */}
         {showModal && (
