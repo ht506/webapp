@@ -508,7 +508,7 @@ function App() {
                 </div>
               </div>
             );
-          }]}
+          })}
         </div>
 
         {showModal && (
