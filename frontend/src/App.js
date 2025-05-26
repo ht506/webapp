@@ -295,35 +295,48 @@ function App() {
           border-radius: 12px;
           max-width: 80%;
           position: relative;
+          margin: 8px 0;
         }
         
         .reply-card.you {
-          background: #264B9A; /* Blue color for your replies */
+          background: #264B9A; /* Blue for your replies */
           align-self: flex-start;
           margin-left: 12px;
         }
         
         .reply-card.others {
-          background: #2E7D32; /* Green color for others' replies */
+          background: #2E7D32; /* Green for others */
           align-self: flex-end;
           margin-right: 12px;
         }
         
-        /* Make arrows more visible */
+        /* Left arrow for your replies */
         .reply-card.you::after {
-          border-width: 10px 12px 10px 0;
-          left: -12px;
+          content: '';
+          position: absolute;
+          left: -10px;
+          bottom: 10px;
+          border-width: 8px 10px 8px 0;
+          border-style: solid;
+          border-color: transparent #264B9A transparent transparent;
         }
         
+        /* Right arrow for others' replies */
         .reply-card.others::after {
-          border-width: 10px 0 10px 12px;
-          right: -12px;
+          content: '';
+          position: absolute;
+          right: -10px;
+          bottom: 10px;
+          border-width: 8px 0 8px 10px;
+          border-style: solid;
+          border-color: transparent transparent transparent #2E7D32;
         }
         
         .reply-username {
           font-weight: bold;
           font-size: 0.8rem;
           margin-bottom: 4px;
+          color: white;
         }
 
         .top-right-link {
