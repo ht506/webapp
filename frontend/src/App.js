@@ -31,6 +31,17 @@ function App() {
     loadNotes();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch('https://webapp-backend-9ugp.onrender.com/notes')
+        .then(res => res.json())
+        .then(data => setNotes(data))
+        .catch(console.error);
+    }, 3000); // Checks for updates every 3 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
   const clearNotes = () => {
     setNotes([]);
     localStorage.removeItem("notes");
@@ -93,31 +104,45 @@ function App() {
 
   const [replyText, setReplyText] = useState("");
 
-  const handleReplySubmit = async () => {
+   const handleReplySubmit = async () => {
     if (replyText.trim() === "") return;
-
+  
     try {
       const noteId = notes[openedNoteIndex].id;
-      const response = await fetch(`https://webapp-backend-9ugp.onrender.com/notes/${noteId}/replies`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: replyText.trim() })
-      });
+      
+      // 1. Post the reply (your existing code)
+      const response = await fetch(
+        `https://webapp-backend-9ugp.onrender.com/notes/${noteId}/replies`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: replyText.trim() }),
+        }
+      );
       const newReply = await response.json();
-
-      setNotes(prevNotes => 
-        prevNotes.map((note, idx) => 
+  
+      // 2. OPTION A: Optimistic UI Update (fast but might need backup sync)
+      setNotes(prevNotes =>
+        prevNotes.map((note, idx) =>
           idx === openedNoteIndex
             ? { ...note, replies: [...(note.replies || []), newReply] }
             : note
         )
       );
+  
+      // 2. OPTION B: Full Sync (slower but bulletproof - add this BELOW Option A)
+      const updatedNotes = await fetch(
+        "https://webapp-backend-9ugp.onrender.com/notes"
+      ).then((res) => res.json());
+      setNotes(updatedNotes);
+  
       setReplyText("");
     } catch (error) {
       console.error("Failed to save reply:", error);
+      // Optional: Revert optimistic update here if using Option A
     }
   };
-
+  
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm(prev => ({
