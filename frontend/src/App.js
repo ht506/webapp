@@ -508,7 +508,6 @@ function App() {
                 </div>
               </div>
 
-        {/* Modal for adding new note */}
         {showModal && (
           <div
             style={{
