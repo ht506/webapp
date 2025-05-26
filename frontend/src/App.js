@@ -120,9 +120,16 @@ function App() {
   ];
 
   const getRandomAnimationProps = (index) => {
-    const duration = 5 + Math.random() * 5;
-    const delay = (index * 2) % duration;
-    return { duration, delay };
+    const duration = 30 + Math.random() * 30; // Slower, smoother movement
+    const delay = Math.random() * 10; // More random timing
+    return { 
+      duration,
+      delay,
+      startX: Math.random() * 100, // Random starting positions
+      startY: Math.random() * 100,
+      moveX: (Math.random() - 0.5) * 200, // Wider movement range
+      moveY: (Math.random() - 0.5) * 200
+    };
   };
 
   const openNoteThread = (index) => {
@@ -194,12 +201,13 @@ function App() {
   return (
     <>
       <style>{`
+        /* Smoother Floating Animation */
         @keyframes floatAround {
-          0% { transform: translate(0, 0); }
-          25% { transform: translate(10px, -10px); }
-          50% { transform: translate(0, -20px); }
-          75% { transform: translate(-10px, -10px); }
-          100% { transform: translate(0, 0); }
+          0% { transform: translate(0, 0) rotate(0deg); }
+          25% { transform: translate(20px, -15px) rotate(2deg); }
+          50% { transform: translate(-10px, -25px) rotate(-1deg); }
+          75% { transform: translate(-20px, 5px) rotate(1deg); }
+          100% { transform: translate(0, 0) rotate(0deg); }
         }
         
         @keyframes pulse {
@@ -247,9 +255,23 @@ function App() {
         .note-card button {
           pointer-events: auto;  
         }
+
+        .note-card-content {
+          flex-grow: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .note-card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-top: 8px;
+        }
         
         .note-card.floating {
-          animation: floatAround var(--duration) ease-in-out infinite var(--delay);
+          animation: floatAround 25s ease-in-out infinite;
+          animation-delay: calc(var(--index) * 0.5s);
         }
         
         .note-card:hover {
@@ -291,19 +313,35 @@ function App() {
           z-index: 100;
         }
         
+        /* Minimalist Scrollbar */
         .reply-container {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          margin-top: 12px;
+          max-height: 300px;
+          overflow-y: auto;
+          scrollbar-width: thin;
+          scrollbar-color: #444 #222;
+          padding-right: 4px;
+        }
+
+        .reply-container::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .reply-container::-webkit-scrollbar-track {
+          background: transparent;
         }
         
+        .reply-container::-webkit-scrollbar-thumb {
+          background: #444;
+          border-radius: 2px;
+        }
+        
+        /* Improved Reply Cards */
         .reply-card {
-          padding: 8px 12px;
-          border-radius: 12px;
-          max-width: 80%;
+          min-height: 90px;
+          padding: 12px 16px;
+          margin: 10px 0;
           position: relative;
-          margin: 8px 0;
+          border-radius: 12px;
         }
         
         .reply-card.you {
@@ -359,6 +397,12 @@ function App() {
         .top-right-link:hover {
           opacity: 1;
           text-decoration: underline;
+        }
+
+        /* Button Alignment Fix */
+        .open-note-btn {
+          align-self: flex-end;
+          margin-top: auto;
         }
       `}</style>
 
