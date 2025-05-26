@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from "react";
 
 function App() {
+  const [userId] = useState(() => {
+    // Generate or load a unique ID for this browser
+    if (!localStorage.getItem('userId')) {
+      localStorage.setItem('userId', Math.random().toString(36).substring(2, 10));
+    }
+    return localStorage.getItem('userId');
+  });
+
+  const [username] = useState(() => {
+    // Generate a random username like "BlueDragon42"
+    const adjectives = ['Red', 'Blue', 'Green', 'Happy', 'Clever', 'Swift'];
+    const nouns = ['Dragon', 'Phoenix', 'Wolf', 'Owl', 'Fox', 'Eagle'];
+    if (!localStorage.getItem('username')) {
+      const randomName = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${
+        nouns[Math.floor(Math.random() * nouns.length)]}${
+        Math.floor(Math.random() * 100)}`;
+      localStorage.setItem('username', randomName);
+    }
+    return localStorage.getItem('username');
+  });
+  
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // For loading animation
   const [isRegistering, setIsRegistering] = useState(false);
@@ -109,16 +130,15 @@ function App() {
   
     try {
       const noteId = notes[openedNoteIndex].id;
-      
-      // 1. Post the reply (your existing code)
-      const response = await fetch(
-        `https://webapp-backend-9ugp.onrender.com/notes/${noteId}/replies`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: replyText.trim() }),
-        }
-      );
+      const response = await fetch(`https://webapp-backend-9ugp.onrender.com/notes/${noteId}/replies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: replyText.trim(),
+          userId: userId,       // ▼▼▼ ADD THIS LINE
+          username: username    // ▼▼▼ ADD THIS LINE
+        })
+      });
       const newReply = await response.json();
   
       // 2. OPTION A: Optimistic UI Update (fast but might need backup sync)
@@ -259,6 +279,60 @@ function App() {
           display: flex;
           gap: 1.5rem;
           z-index: 100;
+        }
+        
+        .reply-container {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-top: 12px;
+        }
+        
+        .reply-card {
+          padding: 8px 12px;
+          border-radius: 12px;
+          max-width: 80%;
+          position: relative;
+        }
+        
+        .reply-card.you {
+          background: #333;
+          align-self: flex-start;
+          margin-left: 12px;
+        }
+        
+        .reply-card.others {
+          background: #444;
+          align-self: flex-end;
+          margin-right: 12px;
+        }
+        
+        /* Arrow for your replies (points left) */
+        .reply-card.you::after {
+          content: '';
+          position: absolute;
+          left: -10px;
+          bottom: 10px;
+          border-width: 8px 10px 8px 0;
+          border-style: solid;
+          border-color: transparent #333 transparent transparent;
+        }
+        
+        /* Arrow for others' replies (points right) */
+        .reply-card.others::after {
+          content: '';
+          position: absolute;
+          right: -10px;
+          bottom: 10px;
+          border-width: 8px 0 8px 10px;
+          border-style: solid;
+          border-color: transparent transparent transparent #444;
+        }
+        
+        .reply-username {
+          font-weight: bold;
+          font-size: 0.8rem;
+          margin-bottom: 4px;
         }
 
         .top-right-link {
@@ -536,6 +610,9 @@ function App() {
               }}
             >
               <div style={{ whiteSpace: "pre-wrap", fontSize: "1.1rem" }}>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '4px' }}>
+                  {notes[openedNoteIndex].username || 'Anonymous'}
+                </div>
                 {notes[openedNoteIndex].text}
               </div>
               <div
@@ -567,49 +644,27 @@ function App() {
                   overflowY: "auto",
                 }}
               >
-                {notes[openedNoteIndex].replies && notes[openedNoteIndex].replies.length > 0 ? (
-                  notes[openedNoteIndex].replies.map((reply, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        marginBottom: "0.8rem",
-                        fontSize: "0.9rem",
-                        background: "#333",
-                        padding: "0.5rem",
-                        borderRadius: "6px",
-                        textAlign: "left",
-                      }}
+                <div className="reply-container">
+                  {notes[openedNoteIndex].replies?.map((reply, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`reply-card ${
+                        reply.userId === userId ? 'you' : 'others'
+                      }`}
                     >
+                      <div className="reply-username">
+                        {reply.username || 'Anonymous'}
+                      </div>
                       <div>{reply.text}</div>
-                      <div
-                        style={{
-                          fontSize: "0.7rem",
-                          opacity: 0.5,
-                          marginTop: "0.2rem",
-                          userSelect: "none",
-                        }}
-                      >
+                      <div style={{ fontSize: "0.7rem", opacity: 0.5, marginTop: "0.2rem" }}>
                         {new Date(reply.createdAt).toLocaleString("en-US", {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
+                          hour: 'numeric',
+                          minute: '2-digit'
                         })}
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div
-                    style={{
-                      fontSize: "0.9rem",
-                      color: "#bbb",
-                      padding: "1rem",
-                    }}
-                  >
-                    No replies yet.
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
 
               {/* Reply input */}
