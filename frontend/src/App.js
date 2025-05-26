@@ -401,7 +401,7 @@ function App() {
             height: "70vh",
             pointerEvents: openedNoteIndex !== null ? "none" : "auto",
             transformStyle: "preserve-3d",
-            perspective: "1000px", 
+            perspective: 1000, 
             isolation: "isolate",
           }}
           className={openedNoteIndex !== null ? "blurred" : ""}
@@ -507,6 +507,9 @@ function App() {
                   </button>
                 </div>
               </div>
+            );
+          }]}
+        </div>
 
         {showModal && (
           <div
