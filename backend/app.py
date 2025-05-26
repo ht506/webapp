@@ -24,16 +24,16 @@ class Note(db.Model):
     color = db.Column(db.String(20), default='default')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     replies = db.relationship('Reply', backref='note', lazy=True)
-    user_id = db.Column(db.String(50))  # Add this line
-    username = db.Column(db.String(50)) # Add this line
+    user_id = db.Column(db.String(50))
+    username = db.Column(db.String(50))
 
 class Reply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(500), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=False)
-    user_id = db.Column(db.String(50))  # Add this line
-    username = db.Column(db.String(50)) # Add this line
+    user_id = db.Column(db.String(50))
+    username = db.Column(db.String(50))
 
 # Create tables
 with app.app_context():
@@ -55,12 +55,15 @@ def get_notes():
         } for reply in note.replies]
     } for note in notes])
 
+# For creating notes
 @app.route('/notes', methods=['POST'])
 def create_note():
     data = request.get_json()
     new_note = Note(
         text=data['text'],
-        color=data.get('color', 'default')
+        color=data.get('color', 'default'),
+        user_id=data['userId'],  # Add this
+        username=data['username']  # Add this
     )
     db.session.add(new_note)
     db.session.commit()
@@ -77,7 +80,9 @@ def add_reply(note_id):
     data = request.get_json()
     new_reply = Reply(
         text=data['text'],
-        note_id=note_id
+        note_id=note_id,
+        user_id=data['userId'],  # Add this
+        username=data['username']  # Add this
     )
     db.session.add(new_reply)
     db.session.commit()
