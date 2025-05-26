@@ -62,8 +62,8 @@ def create_note():
     new_note = Note(
         text=data['text'],
         color=data.get('color', 'default'),
-        user_id=data['userId'],  # Add this
-        username=data['username']  # Add this
+        user_id=data['userId'],
+        username=data['username']
     )
     db.session.add(new_note)
     db.session.commit()
@@ -71,6 +71,8 @@ def create_note():
         'id': new_note.id,
         'text': new_note.text,
         'color': new_note.color,
+        'userId': new_note.user_id,  # Add this
+        'username': new_note.username,  # Add this
         'createdAt': new_note.created_at.isoformat(),
         'replies': []
     }), 201
@@ -81,14 +83,16 @@ def add_reply(note_id):
     new_reply = Reply(
         text=data['text'],
         note_id=note_id,
-        user_id=data['userId'],  # Add this
-        username=data['username']  # Add this
+        user_id=data['userId'],
+        username=data['username']
     )
     db.session.add(new_reply)
     db.session.commit()
     return jsonify({
         'id': new_reply.id,
         'text': new_reply.text,
+        'userId': new_reply.user_id,  # Add this
+        'username': new_reply.username,  # Add this
         'createdAt': new_reply.created_at.isoformat()
     }), 201
 
