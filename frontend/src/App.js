@@ -43,7 +43,7 @@ function App() {
     if (noteText.trim() === "") return;
 
     try {
-      const response = await fetch('http://localhost:8002/notes', {
+      const response = await fetch('https://webapp-backend-9ugp.onrender.com/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
