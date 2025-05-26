@@ -98,7 +98,7 @@ function App() {
 
     try {
       const noteId = notes[openedNoteIndex].id;
-      const response = await fetch(`http://localhost:8002/notes/${noteId}/replies`, {
+      const response = await fetch(`https://webapp-backend-9ugp.onrender.com/notes/${noteId}/replies`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: replyText.trim() })
