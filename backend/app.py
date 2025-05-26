@@ -24,12 +24,16 @@ class Note(db.Model):
     color = db.Column(db.String(20), default='default')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     replies = db.relationship('Reply', backref='note', lazy=True)
+    user_id = db.Column(db.String(50))  # Add this line
+    username = db.Column(db.String(50)) # Add this line
 
 class Reply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(500), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=False)
+    user_id = db.Column(db.String(50))  # Add this line
+    username = db.Column(db.String(50)) # Add this line
 
 # Create tables
 with app.app_context():
