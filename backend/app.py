@@ -4,7 +4,13 @@ from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS
+CORS(app, resources={
+    r"/notes*": {
+        "origins": ["https://webapp-frontend-snlk.onrender.com"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Database configuration (SQLite)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notes.db'
