@@ -204,12 +204,12 @@ function App() {
         /* Smoother Floating Animation */
         @keyframes floatAround {
           0% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(20px, -15px) rotate(2deg); }
-          50% { transform: translate(-10px, -25px) rotate(-1deg); }
-          75% { transform: translate(-20px, 5px) rotate(1deg); }
+          20% { transform: translate(15px, -10px) rotate(1deg); }
+          40% { transform: translate(20px, 5px) rotate(-1deg); }
+          60% { transform: translate(-15px, 10px) rotate(1deg); }
+          80% { transform: translate(-20px, -5px) rotate(-1deg); }
           100% { transform: translate(0, 0) rotate(0deg); }
         }
-        
         @keyframes pulse {
           0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,0,0,0.7); }
           50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(0,0,0,0); }
@@ -270,8 +270,8 @@ function App() {
         }
         
         .note-card.floating {
-          animation: floatAround 25s ease-in-out infinite;
-          animation-delay: calc(var(--index) * 0.5s);
+          animation: floatAround 45s linear infinite;
+          animation-delay: calc(var(--index) * 0.3s);
         }
         
         .note-card:hover {
@@ -323,25 +323,26 @@ function App() {
         }
 
         .reply-container::-webkit-scrollbar {
-          width: 4px;
+          width: 3px;
         }
-
+        
+        .reply-container::-webkit-scrollbar-thumb {
+          background: #555;
+          border-radius: 3px;
+        }
+        
         .reply-container::-webkit-scrollbar-track {
           background: transparent;
         }
         
-        .reply-container::-webkit-scrollbar-thumb {
-          background: #444;
-          border-radius: 2px;
-        }
-        
         /* Improved Reply Cards */
         .reply-card {
-          min-height: 90px;
-          padding: 12px 16px;
-          margin: 10px 0;
+          min-height: 60px; /* Reduced from 90px */
+          padding: 8px 12px; /* Reduced padding */
+          margin: 8px 0; /* Tighter spacing */
           position: relative;
-          border-radius: 12px;
+          border-radius: 8px;
+          font-size: 0.85rem; /* Slightly smaller text */
         }
         
         .reply-card.you {
@@ -354,6 +355,10 @@ function App() {
           background: #2E7D32; /* Green for others */
           align-self: flex-end;
           margin-right: 12px;
+        }
+
+        .reply-card::after {
+          bottom: 8px; /* Adjusted arrow position */
         }
         
         /* Left arrow for your replies */
@@ -379,11 +384,10 @@ function App() {
         }
         
         .reply-username {
-          font-weight: bold;
-          font-size: 0.8rem;
-          margin-bottom: 4px;
-          color: white;
+          font-size: 0.75rem; /* Smaller username */
+          margin-bottom: 2px; /* Tighter spacing */
         }
+
 
         .top-right-link {
           color: #fff;
@@ -486,11 +490,11 @@ function App() {
                   top: `${10 + (index * 10) % 60}%`,
                   left: `${10 + (index * 15) % 70}%`,
                   width: "250px",
-                  height: "80px",
+                  height: "120px", // Increased height
                   background: colorConfig.bg,
                   color: colorConfig.text,
                   borderRadius: "10px",
-                  padding: "0.8rem",
+                  padding: "1rem", // Increased padding
                   boxShadow: "0 6px 12px rgba(0,0,0,0.2)",
                   fontSize: "0.9rem",
                   overflow: "hidden",
@@ -505,31 +509,29 @@ function App() {
                   WebkitBackfaceVisibility: "hidden",
                   animationDelay: `${index * 0.1}s`
                 }}
-                onClick={(e) => {
-                  if (!e.target.closest('button, a')) {
-                    openNoteThread(index);
-                  }
-                }}
               >
-                {/* Username and Text Content */}
-                <div>
+                <div style={{ 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%'
+                }}>
+                  {/* Username */}
                   <div style={{ 
                     fontWeight: 'bold', 
                     fontSize: '0.8rem',
-                    marginBottom: '4px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                    marginBottom: '6px'
                   }}>
                     {note.username || 'Anonymous'}
                   </div>
+                  
+                  {/* Note Text */}
                   <div style={{ 
-                    flex: "1 1 auto",
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
+                    flex: 1,
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical'
                   }}>
                     {note.text}
                   </div>
@@ -537,39 +539,33 @@ function App() {
               
                 {/* Date and Button */}
                 <div>
-                  <div
-                    style={{
+                  <div style={{ 
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    marginTop: '8px'
+                  }}>
+                    <div style={{
                       fontSize: "0.7rem",
-                      marginTop: "0.5rem",
                       opacity: 0.6,
-                      userSelect: "none",
-                    }}
-                  >
-                    {new Date(note.createdAt).toLocaleString("en-US", {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+                    }}>
+                      {new Date(note.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </div>
+                    <button
+                      style={{
+                        background: colorConfig.bg,
+                        border: `1px solid ${colorConfig.text}`,
+                        borderRadius: "6px",
+                        padding: "0.3rem 0.8rem",
+                        fontSize: "0.8rem",
+                        color: colorConfig.text,
+                        fontWeight: "bold",
+                        alignSelf: 'flex-end'
+                      }}
+                    >
+                      Open It
+                    </button>
                   </div>
-                  <button
-                    onClick={() => openNoteThread(index)}
-                    style={{
-                      marginTop: "6px",
-                      alignSelf: "flex-start",
-                      background: colorConfig.bg,
-                      border: "none",
-                      borderRadius: "6px",
-                      padding: "0.3rem 0.8rem",
-                      fontSize: "0.8rem",
-                      color: colorConfig.text,
-                      fontWeight: "bold",
-                      userSelect: "none",
-                    }}
-                  >
-                    Open It
-                  </button>
                 </div>
               </div>
             );
