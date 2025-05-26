@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     const loadNotes = async () => {
       try {
-        const response = await fetch('http://localhost:8002/notes');
+        const response = await fetch('https://webapp-backend-9ugp.onrender.com/notes');
         const data = await response.json();
         setNotes(data);
       } catch (error) {
